@@ -12,6 +12,11 @@ export type CreateUserRequest = {
     password: string,
 }
 
+export type LoginUserRequest = {
+    username: string,
+    password: string,
+}
+
 export function toUserResource (user: User): UserResource {
     return {
         name: user.name,
