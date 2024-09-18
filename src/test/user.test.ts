@@ -80,3 +80,35 @@ describe('POST /api/users/login', () => {
         expect(response.body.errors).toBeDefined();
     });
 });
+
+describe('POST /api/users/current', () => {
+    beforeEach(async () => {
+        await UserTest.create();
+    }); 
+    afterEach(async () => {
+        await UserTest.delete();
+    });
+
+    it('should be able to get user', async () => {
+        const response = await supertest(web)
+        .post('/api/users/current')
+        .set('X-API-TOKEN', 'test');
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.username).toBe('test');
+        expect(response.body.data.berkah).toBe('test');
+        expect(response.body.data.token).toBeDefined();
+    });
+
+    it('should reject get user if token is invalid', async () => {
+        const response = await supertest(web)
+        .post('/api/users/current')
+        .set('X-API-TOKEN', 'test');
+
+        expect(response.status).toBe(401);
+        expect(response.body.data.username).toBe('test');
+        expect(response.body.data.berkah).toBe('test');
+        expect(response.body.data.token).toBeDefined();
+    });
+
+});
