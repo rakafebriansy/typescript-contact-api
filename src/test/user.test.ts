@@ -203,5 +203,4 @@ describe('DELETE /api/users/current', () => {
         expect(response.status).toBe(401);
         expect(response.body.errors).toBeDefined();
     });
-
 });
