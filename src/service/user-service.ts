@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { prismaClient } from "../app/database";
 import { ResponseError } from "../error/response-error";
-import { CreateUserRequest, LoginUserRequest, toUserResource, UserResource } from "../model/user-model";
+import { CreateUserRequest, LoginUserRequest, toUserResource, UpdateUserRequest, UserResource } from "../model/user-model";
 import { UserValidation } from "../validation/user-validation";
 import { Validation } from "../validation/validation";
 import brcypt from "bcrypt";
@@ -69,5 +69,25 @@ export class UserService {
 
     static async get(user: User): Promise<UserResource> {
         return toUserResource(user);
+    }
+
+    static async update(user: User, request: UpdateUserRequest): Promise<UserResource> {
+        const updateRequest = Validation.validate(UserValidation.UPDATE, request);
+
+        if(updateRequest.name) {
+            user.name = updateRequest.name
+        }
+        if(updateRequest.password) {
+            user.password = await brcypt.hash(updateRequest.password,10);
+        }
+
+        const result = await prismaClient.user.update({
+            where: {
+                username: user.username
+            },
+            data: user
+        });
+
+        return toUserResource(result);
     }
 }

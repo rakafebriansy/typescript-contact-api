@@ -1,4 +1,5 @@
 import supertest from "supertest";
+import bcrypt from "bcrypt";
 import { web } from "../app/web";
 import { UserTest } from "./test-util";
 
@@ -103,6 +104,70 @@ describe('GET /api/users/current', () => {
         const response = await supertest(web)
         .get('/api/users/current')
         .set('X-API-TOKEN', 'wrong');
+
+        expect(response.status).toBe(401);
+        expect(response.body.errors).toBeDefined();
+    });
+
+});
+
+describe('PATCH /api/users/current', () => {
+    beforeEach(async () => {
+        await UserTest.create();
+    }); 
+    afterEach(async () => {
+        await UserTest.delete();
+    });
+
+    it('should be able to update user\'s name', async () => {
+        const response = await supertest(web)
+        .patch('/api/users/current')
+        .set('X-API-TOKEN', 'test')
+        .send({
+            name: 'newname'
+        });
+
+        console.log(response.body)
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.name).toBe('newname');
+    });
+
+    it('should be able to update user\'s password', async () => {
+        const response = await supertest(web)
+        .patch('/api/users/current')
+        .set('X-API-TOKEN', 'test')
+        .send({
+            password: 'new123',
+        });;
+
+        expect(response.status).toBe(200);
+
+        const user = await UserTest.get();
+        expect(await bcrypt.compare('new123', user.password)).toBe(true);
+    });
+
+    it('should reject update user if requests are invalid', async () => {
+        const response = await supertest(web)
+        .patch('/api/users/current')
+        .set('X-API-TOKEN', 'test')
+        .send({
+            password: '',
+            name: ''
+        });
+
+        expect(response.status).toBe(400);
+        expect(response.body.errors).toBeDefined();
+    });
+
+    it('should reject update user if token is invalid', async () => {
+        const response = await supertest(web)
+        .patch('/api/users/current')
+        .set('X-API-TOKEN', 'wrong')
+        .send({
+            password: 'new',
+            name: 'new'
+        });
 
         expect(response.status).toBe(401);
         expect(response.body.errors).toBeDefined();
