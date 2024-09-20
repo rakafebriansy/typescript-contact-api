@@ -18,6 +18,11 @@ export type CreateAddressRequest = {
     postal_code: string
 }
 
+export type GetAddressRequest = {
+    contact_id: number,
+    id: number
+}
+
 export type UpdateAddressRequest = {
     id: number,
     contact_id: number,
@@ -27,6 +32,8 @@ export type UpdateAddressRequest = {
     country: string,
     postal_code: string
 }
+
+export type RemoveAddressRequest = GetAddressRequest;
 
 export function toAddressResource(address: Address): AddressResource {
     return {

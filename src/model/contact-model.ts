@@ -31,11 +31,6 @@ export type SearchContactRequest = {
     size: number,
 }
 
-export type GetAddressRequest = {
-    contact_id: number,
-    id: number
-}
-
 export function toContactResource(contact: Contact): ContactResource {
     return {
         id: contact.id,
